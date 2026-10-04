@@ -1,6 +1,8 @@
 #ifndef ALLOCATOR_H
 #define ALLOCATOR_H
 
+#include <cstddef>
+
 template <typename T>
 class Allocator 
 {
