@@ -7,10 +7,13 @@ template <typename T>
 class Allocator 
 {
     public:
+    using value_type = T;
+    using size_type = std::size_t;
+
     Allocator() noexcept = default;
 
-    T* allocate(std::size_t count);
-    void deallocate(T* p, std::size_t count);
+    value_type* allocate(size_type count);
+    void deallocate(value_type* p, size_type count);
 };
 
 #endif
