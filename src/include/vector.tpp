@@ -52,7 +52,20 @@ template <typename T>
 Vector<T>::Vector(Vector&& other) noexcept : Vector(other, other._alloc) {}
 
 template <typename T>
-Vector<T>::Vector(std::initializer_list<T> list, const Allocator<T>& alloc) {}
+Vector<T>::Vector(std::initializer_list<T> list, const Allocator<T>& alloc)
+: _alloc(alloc),
+  _data(_alloc.allocate(list.size)),
+  _capacity(list.size()),
+  _size(list.size)
+{
+    for (std::size_t i = 0; i<_size; i++)
+        new (_data + i) T(list[i]);
+}
 
 template <typename T>
-Vector<T>::~Vector(){}
+Vector<T>::~Vector()
+{
+    for (std::size_t i = 0; i<_size; i++)
+        _data[i].~T();
+    _alloc.deallocate(_data);
+}
