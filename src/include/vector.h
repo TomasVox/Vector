@@ -11,11 +11,6 @@
 template <typename T>
 class Vector
 {
-    T* _data;
-    std::size_t _size;
-    std::size_t _capacity;
-    Allocator<T> _alloc;
-
     public:
         using value_type = T;
         using size_type = std::size_t;
@@ -32,7 +27,7 @@ class Vector
 
         explicit Vector(size_type count, const Allocator<value_type>& alloc = Allocator<value_type>());
 
-        Vector(size_type count, const value_type& value, const Allocator<value_type>& alloc = Allocator<value_type>());
+        Vector(size_type count, const_reference value, const Allocator<value_type>& alloc = Allocator<value_type>());
 
         Vector(const Vector& other);
         Vector(Vector&& other) noexcept;
@@ -104,6 +99,11 @@ class Vector
        iterator insert(const_iterator pos, InputIt first, InputIt last);
        iterator erase(const_iterator pos); // Erases elements.
        iterator erase(const_iterator first, const_iterator last);
+    private:
+        value_type* _data;
+        std::size_t _size;
+        std::size_t _capacity;
+        Allocator<T> _alloc;
 };
 
 #endif
