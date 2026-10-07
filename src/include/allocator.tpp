@@ -1,13 +1,14 @@
 #include "allocator.h"
 
 #include <cstddef>
+#include <new>
+#include <limits>
 
 template <typename T>
 T* Allocator<T>::allocate(std::size_t count)
 {
-    /*
-        Not finished.
-    */
+    if (count > std::numeric_limits<std::size_t>::max() / sizeof(T))
+        throw std::bad_array_new_length();
 
     T* p = static_cast<T*>(
         ::operator new(count * sizeof(T))
@@ -16,10 +17,7 @@ T* Allocator<T>::allocate(std::size_t count)
 }
 
 template <typename T>
-void Allocator<T>::deallocate(T* p, size_type count)
+void Allocator<T>::deallocate(T* p)
 {
-    /*
-        Not finished.
-    */
-    ::operator delete(p);
+    ::operator delete(p)
 }

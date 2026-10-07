@@ -13,7 +13,7 @@ class Allocator
     Allocator() noexcept = default;
 
     value_type* allocate(size_type count);
-    void deallocate(value_type* p, size_type count);
+    void deallocate(value_type* p);
 };
 
 #endif
