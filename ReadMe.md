@@ -15,3 +15,10 @@ The problem here is: Vector class is a template. It makes the code in the implem
 The 90% of the time I was figuring out how to code.
 
 ### Preferences and decisions while coding
+Due my interest in learning how to manage memory, I implemented everything manual. Thus, there are functions, like the copy assigment operator that OVER COMPLICATES the implementation. In that particular function I could have done just:
+-> swap(*this, other);
+But that would not be educative for me.
+
+## Limitations
+This std::Vector implementation does not include all std::Vector functions. Nonetheless, it includes most of them. Here is a list of all the funcions implemented:
+I must mention, the exeption safety implemented is not the most acurrate. In a std::Vector, if something happens, you keep your original vector. I could replicate that, but in this implementation I decided just for simplicity and to keep it manual. 
