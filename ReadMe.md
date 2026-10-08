@@ -12,4 +12,6 @@ As said before, this is an implementation with learning purposes. Thus, problems
 
 The problem here is: Vector class is a template. It makes the code in the implementation too cumbersome to read. I searched alternative methods to keep that structure and keep the code readable and clean. I found out, in this particular case (There could be more cases, lot more cases) it's better the simplicity rather a complex structure that keeps the code readable. So I had to change Vector.cpp to a template implementation file: Vector.tpp. It is actually still pretty readable.
 
+The 90% of the time I was figuring out how to code.
+
 ### Preferences and decisions while coding

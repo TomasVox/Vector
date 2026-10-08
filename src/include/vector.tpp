@@ -69,3 +69,32 @@ Vector<T>::~Vector()
         _data[i].~T();
     _alloc.deallocate(_data);
 }
+
+template <typename T>
+Vector<T>& Vector<T>::operator=(const Vector& other)
+{
+}
+
+template <typename T>
+Vector<T>& Vector<T>::operator=(Vector&& other) noexcept
+{
+
+}
+
+template <typename T>
+Vector<T>& Vector<T>::operator=(std::initializer_list<T> list)
+{
+
+}
+
+template <typename T>
+T& Vector<T>::operator[](std::size_t index)
+{
+
+}
+
+template <typename T>
+const T& Vector<T>::operator[](std::size_t index) const
+{
+
+}
