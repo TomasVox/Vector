@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <stdexcept>
+#include <limits>
 
 /*
     Constructors and destructor
@@ -266,7 +267,7 @@ std::size_t Vector<T>::size() const
 template <typename T>
 std::size_t Vector<T>::max_size() const
 {
-
+    return std::numeric_limits<std::size_t>::max() / sizeof(T);
 }
 template <typename T>
 std::size_t Vector<T>::capacity() const
@@ -292,12 +293,111 @@ void Vector<T>::reserve(std::size_t capacity)
     if (capacity <= _capacity)
         return;
     T* n_data = _alloc.allocate(capacity);
-    for (std::size_t i = 0; i<_size; i++, ++_capacity)
-    {
-        ::new (n_data + i) T(std::move(_data[i]));
-        _data[i].~T();
+
+    std::size_t constructed = 0;
+    try {
+        for (std::size_t i = 0; i<_size; i++, ++constructed)
+            ::new (n_data + i) T(std::move(_data[i]));
+    } catch (...) {
+        for (std::size_t i = 0; i<constructed; i++)
+            n_data[i].~T();
+        _alloc.deallocate(n_data); 
+        
+        throw;
     }
+    for (std::size_t i = 0; i<_size; i++)
+        n_data[i].~T();
     _alloc.deallocate(_data);
 
+    _capacity = capacity;
     _data = n_data;
+}
+
+/*
+    Modifiers features
+*/
+
+template <typename T>
+void Vector<T>::push_back(const T& element)
+{
+    if (_size >= _capacity)
+        reserve(_capacity > 0 ? _capacity * 2 : 8);
+    
+    ::new (end()) T(element);
+    ++_size;
+}
+template <typename T>
+void Vector<T>::push_back(T&& element)
+{
+    if (_size >= _capacity)
+        reserve(_capacity > 0 ? _capacity * 2 : 8);
+    
+    ::new (end()) T(std::move(element));
+    ++_size;
+}
+
+template <typename T>
+void Vector<T>::pop_back()
+{
+    if (_size <= 0)
+        return;
+    _data[_size - 1].~T();
+    --_size;
+}
+
+template <typename T>
+void Vector<T>::clear()
+{
+    if (_size <= 0)
+        return;
+    for (std::size_t i = 0; i<_size; i++)
+    {
+        _data[i].~T();
+        --_size;
+    }
+}
+
+/*
+STRUGGLING IMPLEMENTING THIS ONE. I'M GONNA IMPLEMENT IT LATER
+
+template <typename T>
+template <class... Args>
+T* Vector<T>::emplace(const T* pos, Args&&... args)
+{
+    std::size_t index = _data + pos;
+    push_back(T(std::forward<Args>(args)));
+
+    if (index == _size)
+        return;
+    for (std::size_t i = _data + index; i>index; i--)
+
+
+}
+*/
+
+template <typename T>
+template <class... Args>
+T& Vector<T>::emplace_back(Args&&... args)
+{
+    push_back(std::move(T(std::forward<Args>(args)...)));
+    return _data[_size - 1];
+}
+
+template <typename T>
+void Vector<T>::resize(std::size_t new_size)
+{
+    if (new_size < _size)
+    {
+        for (std::size_t i = new_size - 1; i<_size; i++)
+            _data[i].~T();
+    }
+    if (new_size > _size)
+    {
+        if (new_size > _capacity)
+            reserve(new_size > _capacity * 2 ? new_size * 2 : _capacity * 2);
+
+        for (std::size_t i = _size; i<new_size; i++)
+            new (data + i) T();
+    }
+    _size = new_size;
 }
