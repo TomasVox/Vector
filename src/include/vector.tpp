@@ -249,3 +249,55 @@ Allocator<T> Vector<T>::get_allocator() const noexcept
 {
     return _alloc;
 }
+
+/*
+    Capacity features implementation:
+*/
+template <typename T>
+bool Vector<T>::empty() const
+{ 
+    return _size > 0;
+}
+template <typename T>
+std::size_t Vector<T>::size() const
+{
+    return _size;
+}
+template <typename T>
+std::size_t Vector<T>::max_size() const
+{
+
+}
+template <typename T>
+std::size_t Vector<T>::capacity() const
+{
+    return _capacity;
+}
+
+template <typename T>
+void Vector<T>::shrink_to_fit()
+{
+    if (_capacity == _size)
+        return;
+    Vector<T> temp(_alloc);
+    temp.reserve(_size);
+    for (std::size_t i = 0; i<_size; i++, ++_size)
+        ::new (temp._data + i) T(_data[i]);
+    *this = std::move(temp);
+}
+
+template <typename T>
+void Vector<T>::reserve(std::size_t capacity)
+{
+    if (capacity <= _capacity)
+        return;
+    T* n_data = _alloc.allocate(capacity);
+    for (std::size_t i = 0; i<_size; i++, ++_capacity)
+    {
+        ::new (n_data + i) T(std::move(_data[i]));
+        _data[i].~T();
+    }
+    _alloc.deallocate(_data);
+
+    _data = n_data;
+}
