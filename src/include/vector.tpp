@@ -2,6 +2,7 @@
 #include "allocator.h"
 
 #include <cstddef>
+#include <stdexcept>
 
 /*
     Constructors and destructor
@@ -158,4 +159,93 @@ template <typename T>
 const T& Vector<T>::operator[](std::size_t index) const
 {
     return _data[index];
+}
+
+/*
+    Access features implementation.
+*/
+template <typename T>
+T& Vector<T>::at(std::size_t pos)
+{
+    if (pos >= _size)
+        throw std::out_of_range("Vector::at: trying to access an index out of range.s");
+    return _data[pos];
+}
+template <typename T>
+const T& Vector<T>::at(std::size_t pos) const
+{
+    if (pos >= _size)
+        throw std::out_of_range("Vector::at: trying to access an index out of range.s");
+    return _data[pos];
+}
+
+template <typename T>
+T& Vector<T>::front()
+{
+    return _data[0]; // While implementing this, this does not have a behaviour if there is no objects in the vector
+}
+template <typename T>
+const T& Vector<T>::front() const
+{
+    return _data[0];
+}
+
+template <typename T>
+T& Vector<T>::back()
+{
+    return _data[_size - 1];
+}
+template <typename T>
+const T& Vector<T>::back() const
+{
+    return _data[_size - 1];
+}
+
+template <typename T>
+T* Vector<T>::data()
+{
+    return _data;
+}
+template <typename T>
+const T* Vector<T>::data() const
+{
+    return _data;
+}
+
+template <typename T>
+T* Vector<T>::begin() noexcept
+{
+    return _data;
+}
+template <typename T>
+const T* Vector<T>::begin() const noexcept
+{
+    return _data;
+}
+template <typename T>
+const T* Vector<T>::cbegin() const noexcept
+{
+    return _data;
+}
+
+template <typename T>
+T* Vector<T>::end() noexcept
+{
+    return _data + _size;
+}
+template <typename T>
+const T* Vector<T>::end() const noexcept
+{
+    return _data + _size;
+}
+template <typename T>
+const T* Vector<T>::cend() const noexcept
+{
+    return _data + _size;
+}
+
+template <typename T>
+Allocator<T> Vector<T>::get_allocator() const noexcept
+{
+    return _alloc;
 }
