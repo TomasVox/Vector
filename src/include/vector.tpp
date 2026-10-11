@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <stdexcept>
 #include <limits>
+#include <iterator>
 
 /*
     Constructors and destructor
@@ -489,7 +490,7 @@ T* Vector<T>::insert(const T* pos, std::size_t count, const T& value)
 template <typename T>
 T* Vector<T>::insert(const T* pos, std::initializer_list<T> list)
 {
-    if (pos >= _data + _size || pos < _data)
+    if (pos > _data + _size || pos < _data)
         return nullptr;
     std::size_t index = pos - _data;
 
@@ -520,5 +521,30 @@ template <typename T>
 template <class InputIt>
 T* Vector<T>::insert(const T* pos, InputIt first, InputIt last)
 {
+    if (pos < _data || pos > _data + _size)
+        return nullptr;
+    std::size_t elements = std::distance(first, last); // I had to use std::distance for versatility.
+    std::size_t index = pos - _data;
+
+    if (elements == 0)
+        return const_cast<T*>(pos);
     
-}
+    if (_size + elements > _capacity)
+        reserve((_size + elements) * 2);
+
+    for (std::size_t i = _size; i>index; --i)
+    {
+        ::new (_data + i + elements- 1) T(std::move(_data[i - 1]));
+        _data[i - 1].~T();
+    }
+
+    std::size_t c_index = index;
+    for (InputIt it = first; it != last; ++it)
+    {
+        ::new (_data + c_index) T(std::move(*it));
+        c_index++;
+    }
+    _size += elements;
+
+    return _data + index;
+}   

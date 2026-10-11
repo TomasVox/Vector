@@ -17,6 +17,8 @@ Also, I would not consider this as a limitation, but it was surprising that std:
 
 I really struggled implementing all the insert overloads. It was a challenge, cause it is actually a demanding function. It swaps objects (in my implementation) to create space, also, constructs and destroys objects. It is demanding. I could not find a way to apply the DRY strategy (Don't Repeat Yourself). I could not, even though I did it many times in the implementation. Thus, many code lines just to overload the insert function.
 
+You see the paragraph above? Well, Actually, I could. I could apply the DRY strategy to insert.
+
 ### Preferences and decisions while coding
 Due my interest in learning how to manage memory, I implemented everything manual. Thus, there are functions, like the copy assigment operator that OVER COMPLICATES the implementation. In that particular function I could have done just:
 -> swap(*this, other);
