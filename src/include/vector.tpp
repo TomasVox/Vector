@@ -384,20 +384,141 @@ T& Vector<T>::emplace_back(Args&&... args)
 }
 
 template <typename T>
-void Vector<T>::resize(std::size_t new_size)
+void Vector<T>::resize(std::size_t new_size, const T& value)
 {
     if (new_size < _size)
     {
-        for (std::size_t i = new_size - 1; i<_size; i++)
-            _data[i].~T();
+        for (std::size_t i = _size; i>new_size; i--)
+            _data[i - 1].~T();
     }
     if (new_size > _size)
     {
+        T val;
+
         if (new_size > _capacity)
-            reserve(new_size > _capacity * 2 ? new_size * 2 : _capacity * 2);
+        {
+            if (&value >= _data && &value <= _data + _capacity)
+                val(value);
+
+            std::size_t capacity = (_capacity == 0) ? new_size : _capacity * 2;
+            reserve(capacity < new_size ? new_size : capacity); // I decided reserve this amount of memory to avoid reserve excess of memory if it is not necessary.
+        }
 
         for (std::size_t i = _size; i<new_size; i++)
-            new (data + i) T();
+            new (_data + i) T(value);
     }
     _size = new_size;
+}
+
+template <typename T>
+void Vector<T>::resize(std::size_t new_size)
+{
+    resize(new_size, T());
+}
+
+template <typename T>
+void Vector<T>::swap(Vector<T>& other) noexcept
+{
+    T* data_buffer = other._data;
+    std::size_t cap_buffer = other._capacity;
+    std::size_t size_buffer = other._size;
+
+    other._data = _data;
+    other._capacity = _capacity;
+    other._size = _size;
+
+    _data = data_buffer;
+    _capacity = cap_buffer;
+    _size = size_buffer;
+}
+
+template <typename T>
+T* Vector<T>::insert(const T* pos, const T& value)
+{
+
+    if (pos >= _data + _size || pos < _data)
+        return nullptr;
+    std::size_t index = pos - _data;
+    push_back(value);
+
+    for (std::size_t i = _size - 1; i>index; i--)
+        std::swap(_data[i - 1], _data[i]);
+    
+    return _data + index;
+}
+
+template <typename T>
+T* Vector<T>::insert(const T* pos, T&& value)
+{
+    if (pos >= _data + _size || pos < _data)
+        return nullptr;
+    std::size_t index = pos - _data;
+    push_back(std::move(value));
+
+    for (std::size_t i = _size - 1; i>index; i--)
+        std::swap(_data[i - 1], _data[i]);
+    
+    return _data + index;
+}
+
+template <typename T>
+T* Vector<T>::insert(const T* pos, std::size_t count, const T& value)
+{
+    if (pos >= _data + _size || pos < _data)
+        return nullptr;
+    std::size_t index = pos - _data;
+
+    if (count == 0) 
+        return const_cast<T*>(pos);
+
+    if (_size + count > _capacity)
+        reserve((_size + count) * 2);
+
+    for (std::size_t i = _size; i>index; --i)
+    {
+        ::new (_data + i + count - 1) T(std::move(_data[i - 1]));
+        _data[i - 1].~T();
+    }
+    for (std::size_t i = index; i<index + count; i++)
+        ::new (_data + i) T(value);
+    _size += count;
+    
+    return _data + index;
+}
+
+template <typename T>
+T* Vector<T>::insert(const T* pos, std::initializer_list<T> list)
+{
+    if (pos >= _data + _size || pos < _data)
+        return nullptr;
+    std::size_t index = pos - _data;
+
+    if (list.size() == 0) 
+        return const_cast<T*>(pos);
+
+    if (_size + list.size() > _capacity)
+        reserve((_size + list.size()) * 2);
+
+    for (std::size_t i = _size; i>index; --i)
+    {
+        ::new (_data + i + list.size() - 1) T(std::move(_data[i - 1]));
+        _data[i - 1].~T();
+    }
+
+    std::size_t c_index = index;
+    for (const auto& item : list)
+    {
+        ::new (_data + index) T(std::move(list));
+        ++c_index
+    }
+    _size += list.size();
+    
+    return _data + index;
+}
+
+template <typename T>
+template <class InputIt>
+T* Vector<T>::insert(const T* pos, InputIt first, InputIt last)
+{
+    
 }

@@ -15,6 +15,8 @@ The problem here is: Vector class is a template. It makes the code in the implem
 The 90% of the time I was figuring out how to code.
 Also, I would not consider this as a limitation, but it was surprising that std::Vector is not exception safety in every part of his structure. Sometimes, it prefers optimization over security. It is actually, beneficial. It delegates responsability to the programmer who is going to use the library, but you get more speed. In functions like: at() or the access operator. Wraping the code in a try-catch block forces to use more clock cicles.
 
+I really struggled implementing all the insert overloads. It was a challenge, cause it is actually a demanding function. It swaps objects (in my implementation) to create space, also, constructs and destroys objects. It is demanding. I could not find a way to apply the DRY strategy (Don't Repeat Yourself). I could not, even though I did it many times in the implementation. Thus, many code lines just to overload the insert function.
+
 ### Preferences and decisions while coding
 Due my interest in learning how to manage memory, I implemented everything manual. Thus, there are functions, like the copy assigment operator that OVER COMPLICATES the implementation. In that particular function I could have done just:
 -> swap(*this, other);
