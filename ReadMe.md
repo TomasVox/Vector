@@ -2,6 +2,7 @@
 This is not a complex or complete std::Vector implementation. It is an implementation with the essential functions of memory management. Since std::Vector has to manage a lot of exceptions, it would be ridiculous to recreate something similar to it. So, I created this with learning and demonstration purposes. Thus, everything seen in this repository it is far from being something as good as the std::Vector. But it encapsulates the functioning of std::Vector.
 
 ## Problem std::Vector solves
+Cpp is a languaje that gives you the responsability to manage the memory you use.
 
 ### How does it solves it?
 
@@ -19,6 +20,8 @@ I really struggled implementing all the insert overloads. It was a challenge, ca
 
 You see the paragraph above? Well, Actually, I could. I could apply the DRY strategy to insert.
 
+This was really challenging and, actually, really educative. You learn a lot of memory management and how to create a class with operators.
+
 ### Preferences and decisions while coding
 Due my interest in learning how to manage memory, I implemented everything manual. Thus, there are functions, like the copy assigment operator that OVER COMPLICATES the implementation. In that particular function I could have done just:
 -> swap(*this, other);
@@ -26,4 +29,33 @@ But that would not be educative for me.
 
 ## Limitations
 This std::Vector implementation does not include all std::Vector functions. Nonetheless, it includes most of them. Here is a list of all the funcions implemented:
+- Access features:
+    - at()
+    - front()
+    - back()
+    - data()
+    - begin()
+    - cbegin()
+    - end()
+    - cend()
+    - get_allocator()
+- Capacity features:
+    - empty()
+    - size()
+    - max_size()
+    - capacity()
+    - shrink_to_fit()
+    - reserve()
+- Modifiers features:
+    - push_back()
+    - pop_back()
+    - clear()
+    - emplace()
+    - emplace_back()
+    - resize()
+    - swap()
+    - insert()
+    - erase()
+You can see the overloads and the complete definition in include/vector.h or for more information, all the definitions are from: https://en.cppreference.com/cpp/container/vector
+
 I must mention, the exeption safety implemented is not the most acurrate. In a std::Vector, if something happens, you keep your original vector. I could replicate that, but in this implementation I decided just for simplicity and to keep it manual. 

@@ -358,23 +358,15 @@ void Vector<T>::clear()
     }
 }
 
-/*
-STRUGGLING IMPLEMENTING THIS ONE. I'M GONNA IMPLEMENT IT LATER
-
 template <typename T>
 template <class... Args>
 T* Vector<T>::emplace(const T* pos, Args&&... args)
 {
-    std::size_t index = _data + pos;
-    push_back(T(std::forward<Args>(args)));
+    std::size_t index = pos - _data;
 
-    if (index == _size)
-        return;
-    for (std::size_t i = _data + index; i>index; i--)
-
-
+    insert(pos, std::forward<T>(args));
+    return _data + index;
 }
-*/
 
 template <typename T>
 template <class... Args>
@@ -436,85 +428,33 @@ void Vector<T>::swap(Vector<T>& other) noexcept
 template <typename T>
 T* Vector<T>::insert(const T* pos, const T& value)
 {
-
-    if (pos >= _data + _size || pos < _data)
-        return nullptr;
     std::size_t index = pos - _data;
-    push_back(value);
+    insert(pos, 1, value);
 
-    for (std::size_t i = _size - 1; i>index; i--)
-        std::swap(_data[i - 1], _data[i]);
-    
     return _data + index;
 }
 
 template <typename T>
 T* Vector<T>::insert(const T* pos, T&& value)
 {
-    if (pos >= _data + _size || pos < _data)
-        return nullptr;
     std::size_t index = pos - _data;
-    push_back(std::move(value));
+    insert(pos, 1, std::move(value));
 
-    for (std::size_t i = _size - 1; i>index; i--)
-        std::swap(_data[i - 1], _data[i]);
-    
     return _data + index;
 }
 
 template <typename T>
 T* Vector<T>::insert(const T* pos, std::size_t count, const T& value)
 {
-    if (pos >= _data + _size || pos < _data)
-        return nullptr;
-    std::size_t index = pos - _data;
+    Vector<T> buffer(count, value);
 
-    if (count == 0) 
-        return const_cast<T*>(pos);
-
-    if (_size + count > _capacity)
-        reserve((_size + count) * 2);
-
-    for (std::size_t i = _size; i>index; --i)
-    {
-        ::new (_data + i + count - 1) T(std::move(_data[i - 1]));
-        _data[i - 1].~T();
-    }
-    for (std::size_t i = index; i<index + count; i++)
-        ::new (_data + i) T(value);
-    _size += count;
-    
-    return _data + index;
+    return insert(pos, buffer.begin(), buffer.end());
 }
 
 template <typename T>
 T* Vector<T>::insert(const T* pos, std::initializer_list<T> list)
 {
-    if (pos > _data + _size || pos < _data)
-        return nullptr;
-    std::size_t index = pos - _data;
-
-    if (list.size() == 0) 
-        return const_cast<T*>(pos);
-
-    if (_size + list.size() > _capacity)
-        reserve((_size + list.size()) * 2);
-
-    for (std::size_t i = _size; i>index; --i)
-    {
-        ::new (_data + i + list.size() - 1) T(std::move(_data[i - 1]));
-        _data[i - 1].~T();
-    }
-
-    std::size_t c_index = index;
-    for (const auto& item : list)
-    {
-        ::new (_data + index) T(std::move(list));
-        ++c_index
-    }
-    _size += list.size();
-    
-    return _data + index;
+    return insert(pos, list.begin(), list.end());
 }
 
 template <typename T>
@@ -547,4 +487,49 @@ T* Vector<T>::insert(const T* pos, InputIt first, InputIt last)
     _size += elements;
 
     return _data + index;
-}   
+}
+
+template <typename T>
+T* Vector<T>::erase(const T* pos)
+{
+    if (_size == 0)
+        return _data;
+    if (pos >= _data + _size || pos < _data)
+        return nullptr;
+    std::size_t index = pos - _data;
+    
+    for (std::size_t i = index; i<_size; i++)
+        _data[i] = std::move(_data[i + 1]);
+    _data[_size - 1].~T();
+
+    --_size;
+
+    return _data + index;
+}
+
+template <typename T>
+T* Vector<T>::erase(const T* first, const T* last)
+{
+    if (first >= _data + _size || first < _data)
+        return nullptr;
+    if (last >= _data + _size || last < _data)
+        return nullptr;
+    if (last < first)
+        return nullptr;
+
+    std::size_t elements = last - first;
+    if (elements == 0)
+        return const_cast<T*>(first);
+    
+    std::size_t index = first - _data;
+    std::size_t c_index = index;
+
+    for (std::size_t i = _size - elements; i<_size; i++)
+    {
+        _data[c_index] = std::move(_data[i]);
+        _data[i].~T();
+        ++c_index;
+    }
+    _size -= elements;
+    return _data + index;
+}
